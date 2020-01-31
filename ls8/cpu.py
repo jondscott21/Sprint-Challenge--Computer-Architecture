@@ -19,6 +19,14 @@ CMP = 0b10100111 #167
 JMP = 0b01010100 #84
 JEQ = 0b01010101 #85
 JNE = 0b01010110 #86
+
+AND = 0b10101000 #168
+OR = 0b
+XOR = 0b
+NOT = 0b
+SHL = 0b
+SHR = 0b
+MOD = 0b
 class CPU:
     """Main CPU class."""
 
@@ -84,6 +92,20 @@ class CPU:
             self.reg[reg_a] *= self.reg[reg_b]
         elif op == "DIV":
             self.reg[reg_a] /= self.reg[reg_b]
+        elif op = "AND":
+            self.reg[reg_a] & self.reg[reg_b]
+        elif op = "OR":
+            self.reg[reg_a] | self.reg[reg_b]
+        elif op = "XOR":
+            self.reg[reg_a] ^ self.reg[reg_b]
+        elif op = "NOT":
+            ~self.reg[reg_a]
+        elif op = "SHL":
+            self.reg[reg_a] << self.reg[reg_b]
+        elif op = "SHR":
+            self.reg[reg_a] >> self.reg[reg_b]
+        elif op = "MOD":
+            self.reg[reg_a] % self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -147,6 +169,46 @@ class CPU:
         op_b = self.ram_read(self.pc + 2)
         self.alu("DIV", op_a, op_b)
         self.pc += 3
+
+    def handle_AND(self):
+        op_a = self.ram_read(self.pc + 1)
+        op_b = self.ram_read(self.pc + 2)
+        self.alu("AND", op_a, op_b)
+        self.pc += 3
+    def handle_OR(self):
+        op_a = self.ram_read(self.pc + 1)
+        op_b = self.ram_read(self.pc + 2)
+        self.alu("OR", op_a, op_b)
+        self.pc += 3
+    def handle_XOR(self):
+        op_a = self.ram_read(self.pc + 1)
+        op_b = self.ram_read(self.pc + 2)
+        self.alu("XOR", op_a, op_b)
+        self.pc += 3
+    def handle_NOT(self):
+        op_a = self.ram_read(self.pc + 1)
+        op_b = None
+        self.alu("NOT", op_a, op_b)
+        self.pc += 2
+    def handle_SHL(self):
+        op_a = self.ram_read(self.pc + 1)
+        op_b = self.ram_read(self.pc + 2)
+        self.alu("SHL", op_a, op_b)
+        self.pc += 3
+    def handle_SHR(self):
+        op_a = self.ram_read(self.pc + 1)
+        op_b = self.ram_read(self.pc + 2)
+        self.alu("SHR", op_a, op_b)
+        self.pc += 3
+    def handle_MOD(self):
+        op_a = self.ram_read(self.pc + 1)
+        op_b = self.ram_read(self.pc + 2)
+        if self.reg[op_b] == 0:
+            print("You can not modulus by zero")
+            self.running = False
+        else:
+            self.alu("MOD", op_a, op_b)
+            self.pc += 3
 
     def handle_HLT(self):
         self.running = False
