@@ -14,6 +14,7 @@ PUSH = 0b01000101 #69
 POP = 0b01000110 #70
 CALL = 0b01010000 #80
 RET = 0b00010001 #17
+ST = 0b10000100 #132
 
 CMP = 0b10100111 #167
 JMP = 0b01010100 #84
@@ -27,7 +28,7 @@ NOT = 0b01101001 #105
 SHL = 0b10101100 #172
 SHR = 0b10101101 #173
 MOD = 0b10100100 #164
-ADDI = 0b11000000
+ADDI = 0b11000000 #192
 class CPU:
     """Main CPU class."""
 
@@ -49,15 +50,26 @@ class CPU:
         self.branchtable = {}
         self.branchtable[LDI] = self.handle_LDI
         self.branchtable[PRN] = self.handle_PRN
+
         self.branchtable[MUL] = self.handle_MUL
         self.branchtable[ADD] = self.handle_ADD
         self.branchtable[SUB] = self.handle_SUB
         self.branchtable[DIV] = self.handle_DIV
+        self.branchtable[AND] = self.handle_AND
+        self.branchtable[OR] = self.handle_OR
+        self.branchtable[XOR] = self.handle_XOR
+        self.branchtable[NOT] = self.handle_NOT
+        self.branchtable[SHL] = self.handle_SHL
+        self.branchtable[SHR] = self.handle_SHR
+        self.branchtable[SHR] = self.handle_SHR
+        self.branchtable[MOD] = self.handle_MOD
+
         self.branchtable[HLT] = self.handle_HLT
         self.branchtable[PUSH] = self.handle_PUSH
         self.branchtable[POP] = self.handle_POP
         self.branchtable[CALL] = self.handle_CALL
         self.branchtable[RET] = self.handle_RET
+        self.branchtable[ST] = self.handle_ST
 
         self.branchtable[CMP] = self.handle_CMP
         self.branchtable[JMP] = self.handle_JMP
@@ -242,6 +254,12 @@ class CPU:
 
         self.pc = self.ram_read(return_address)
         self.reg[self.sp] += 1
+    
+    def handle_ST(self):
+        op_a = self.ram_read(self.pc + 1)
+        op_b = self.ram_read(self.pc + 2)
+        self.ram_write(self.reg[op_a], self.reg[op_b])
+        self.pc += 3
 
     def handle_CMP(self):
         # Compare the values in two registers.
@@ -296,9 +314,12 @@ class CPU:
     def run(self):
         """Run the CPU."""
         self.running = True   
-        # t = datetime.datetime.now()
+        t = datetime.datetime.now()
         while self.running:
-            # if datetime.datetime.now() - t < datetime.timedelta(seconds=1):
-            #     self.reg[self.IS] = 1
+            if datetime.datetime.now() - t < datetime.timedelta(seconds=1):
+                self.reg[self.IS] = 1
+                # print(self.reg[self.IS])
+            if self.reg[self.IS] == 1:
+                pass
             IR = self.ram[self.pc]
             self.branchtable[IR]()
