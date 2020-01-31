@@ -21,12 +21,13 @@ JEQ = 0b01010101 #85
 JNE = 0b01010110 #86
 
 AND = 0b10101000 #168
-OR = 0b
-XOR = 0b
-NOT = 0b
-SHL = 0b
-SHR = 0b
-MOD = 0b
+OR = 0b10101010 #170
+XOR = 0b10101011 #171
+NOT = 0b01101001 #105
+SHL = 0b10101100 #172
+SHR = 0b10101101 #173
+MOD = 0b10100100 #164
+ADDI = 0b11000000
 class CPU:
     """Main CPU class."""
 
@@ -62,6 +63,7 @@ class CPU:
         self.branchtable[JMP] = self.handle_JMP
         self.branchtable[JEQ] = self.handle_JEQ
         self.branchtable[JNE] = self.handle_JNE
+        self.branchtable[ADDI] = self.handle_ADDI
         self.running = False
 
     def load(self, filename):
@@ -92,19 +94,19 @@ class CPU:
             self.reg[reg_a] *= self.reg[reg_b]
         elif op == "DIV":
             self.reg[reg_a] /= self.reg[reg_b]
-        elif op = "AND":
+        elif op == "AND":
             self.reg[reg_a] & self.reg[reg_b]
-        elif op = "OR":
+        elif op == "OR":
             self.reg[reg_a] | self.reg[reg_b]
-        elif op = "XOR":
+        elif op == "XOR":
             self.reg[reg_a] ^ self.reg[reg_b]
-        elif op = "NOT":
+        elif op == "NOT":
             ~self.reg[reg_a]
-        elif op = "SHL":
+        elif op == "SHL":
             self.reg[reg_a] << self.reg[reg_b]
-        elif op = "SHR":
+        elif op == "SHR":
             self.reg[reg_a] >> self.reg[reg_b]
-        elif op = "MOD":
+        elif op == "MOD":
             self.reg[reg_a] % self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
@@ -285,6 +287,11 @@ class CPU:
             self.pc = self.reg[self.ram_read(self.pc + 1)]
         else:
             self.pc += 2
+    def handle_ADDI(self):
+        op_a = self.ram_read(self.pc + 1)
+        op_b = self.ram_read(self.pc + 2)
+        self.reg[op_a] += op_b
+        self.pc += 3
 
     def run(self):
         """Run the CPU."""
